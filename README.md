@@ -20,6 +20,12 @@
 
 **Shadow Stalker** is a fast-paced 2D platformer built with Pygame CE where you must outrun an AI bot that relentlessly pursues you across multiple themed maps. The bot uses advanced pathfinding and can perform the same movement abilities as the player — wall sliding, wall jumping, and double jumping.
 
+
+## 👥 Contributors
+
+- **Younes BASIR** 
+- **[MOHAMED ZOUBAA](https://github.com/zoubaax)** 
+- **WAJIH BEN EL ADEM** 
 ### The Chase
 
 - **The Stalker** — An AI-controlled enemy that relentlessly pursues you across all maps
@@ -256,11 +262,7 @@ python editor/map_editor.py
 
 ---
 
-## 👥 Contributors
 
-- **Younes BASIR** 
-- **[MOHAMED ZOUBAA**](https://github.com/zoubaax)** 
-- **WAJIH BEN EL ADEM** 
 
 ## 🤝 Contributing
 
