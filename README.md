@@ -256,6 +256,12 @@ python editor/map_editor.py
 
 ---
 
+## 👥 Contributors
+
+- **Younes BASIR** 
+- **[MOHAMED ZOUBAA**](https://github.com/zoubaax)** 
+- **WAJIH BEN EL ADEM** 
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
