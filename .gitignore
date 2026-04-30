@@ -47,6 +47,12 @@ desktop.ini
 !maps/**/*.json
 custom_map.json
 
+# Database (user-specific data)
+game_data.db
+*.db
+*.sqlite
+*.sqlite3
+
 # Reference images (temporary)
 *_reference.png
 *_numbered.png

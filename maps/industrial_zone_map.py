@@ -142,10 +142,17 @@ bg_dir = os.path.join(BASE, "2 Background")
 bg_img = None
 for fname in ("Background.png", "1.png"):
     p = os.path.join(bg_dir, fname)
-    img = load_image(p)
-    if img.get_width() > 1:
-        bg_img = pygame.transform.scale(img, (SCREEN_W, SCREEN_H))
-        break
+    if os.path.exists(p):
+        img = load_image(p)
+        if img and img.get_width() > 1:
+            bg_img = pygame.transform.scale(img, (SCREEN_W, SCREEN_H))
+            print(f"[Industrial Zone] Background loaded: {fname} ({bg_img.get_width()}x{bg_img.get_height()})")
+            break
+    else:
+        print(f"[Industrial Zone] Warning: Background file not found: {p}")
+
+if bg_img is None:
+    print("[Industrial Zone] Warning: No background image loaded, using fallback gradient")
 
 # ── Objects ───────────────────────────────────────────────────────────────────
 o  = lambda p: os.path.join(BASE, "3 Objects", p)
@@ -287,14 +294,11 @@ class Player:
             self.vy = self.jump_force; self.jump_count += 1
             self.on_ground = False; self.frame_idx = 0
 
-    def update(self, dt):
+    def update(self, dt, map_w, map_h):
         keys = pygame.key.get_pressed()
         if   keys[pygame.K_LEFT] or keys[pygame.K_a]: self.vx = -self.speed; self.facing_right = False
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]: self.vx =  self.speed; self.facing_right = True
         else: self.vx = 0
-
-        # Clamp inside room walls
-        if self.x < 2 * TILE_SIZE: self.x = float(2 * TILE_SIZE); self.vx = max(0, self.vx)
 
         if not self.on_ground and self.wall_cd <= 0:
             self.on_wall_l = self._wall('l'); self.on_wall_r = self._wall('r')
@@ -310,6 +314,16 @@ class Player:
             if self.vx > 0:  self.rect.right = h.left;  self.x = float(self.rect.x)
             elif self.vx < 0: self.rect.left = h.right; self.x = float(self.rect.x)
 
+        # Boundary checks AFTER movement
+        if self.x < 0:
+            self.x = 0
+            self.rect.x = 0
+            self.vx = 0
+        
+        # Check if player reached the end of the map
+        if self.x > map_w - TILE_SIZE:
+            return "next"
+
         self.y += self.vy * dt; self.rect.y = int(self.y)
         for h in self._tiles(self.rect):
             if self.vy > 0:  self.rect.bottom = h.top;  self.y = float(self.rect.y); self.vy = 0
@@ -318,8 +332,8 @@ class Player:
         probe = self.rect.copy(); probe.y += 1
         self.on_ground = bool(self._tiles(probe)) and self.vy >= 0
         if self.on_ground: self.jump_count = 0
-        if self.rect.y > map_height:
-            self.x, self.y = float(2 * TILE_SIZE + 10), float(3 * TILE_SIZE); self.vy = 0
+        if self.rect.y > map_h:
+            return "fell"
 
         ns = 'idle'
         if not self.on_ground: ns = 'double_jump' if self.jump_count == 2 else ('jump' if self.vy < 0 else 'fall')
@@ -370,17 +384,41 @@ def run_level(surface, game_state=None):
     if game_state is None:
         game_state = {"health": 3, "max_health": 3, "score": 0, "lives": 3}
 
-    player  = Player(4 * TILE_SIZE, 2 * TILE_SIZE)
+    print(f"[Industrial Zone] Level starting - Surface: {surface.get_width()}x{surface.get_height()}, Background: {'Loaded' if bg_img else 'None'}")
+    
+    player  = Player(4 * TILE_SIZE, 5 * TILE_SIZE)
     clock   = pygame.time.Clock()
-    t = sx = sy = 0.0; running = True
+    t = 0.0
+    # Initialize camera to player position immediately
+    sx = max(0, min(4 * TILE_SIZE - SCREEN_W // 2, map_width - SCREEN_W))
+    sy = max(0, min(5 * TILE_SIZE - SCREEN_H // 2, map_height - SCREEN_H))
+    print(f"[Industrial Zone] Camera init: sx={sx}, sy={sy}, Map size: {map_width}x{map_height}")
+    # AI Bot
+    bot = None
+    if game_state.get("game_mode") == "kids":
+        pass
+    else:
+        try:
+            from ai.mask_dude_bot import MaskDudeBot
+            # Use current bot position if it exists, otherwise spawn behind
+            start_x = game_state.get("bot_x", -100)
+            start_y = game_state.get("bot_y", 200)
+            bot = MaskDudeBot(start_x, start_y, TILE_SIZE, MAP_LAYOUT, SOLID_TILES)
+        except ImportError:
+            pass
 
+    running = True
     while running:
         dt = min(clock.tick(60) / 1000.0, 0.05); t += dt
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: running = False
+            if event.type == pygame.QUIT: 
+                pygame.display.flip()
+                return "quit"
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: running = False
+                if event.key == pygame.K_ESCAPE:
+                    pygame.display.flip()
+                    return "quit"
                 elif event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w): player.jump()
             elif event.type == pygame.VIDEORESIZE:
                 SCREEN_W, SCREEN_H = event.w, event.h
@@ -391,7 +429,34 @@ def run_level(surface, game_state=None):
                     if img.get_width() > 1:
                         bg_img = pygame.transform.scale(img, (SCREEN_W, SCREEN_H)); break
 
-        player.update(dt)
+        status = player.update(dt, map_width, map_height)
+        
+        # Update Bot
+        if bot:
+            bot.set_target(player)
+            bot.update(dt, map_height)
+            # Save bot position to game_state for map-to-map persistence
+            game_state["bot_x"] = bot.x
+            game_state["bot_y"] = bot.y
+            
+            if bot.rect.colliderect(player.rect):
+                # Bot caught player -> Game Over
+                pygame.display.flip()
+                return "game_over"
+        
+        if status == "next":
+            pygame.display.flip()
+            return "next"
+        if status == "fell":
+            game_state["health"] -= 1
+            if game_state["health"] <= 0:
+                pygame.display.flip()
+                return "quit"
+            # Respawn
+            player.x, player.y = float(4 * TILE_SIZE), float(2 * TILE_SIZE)
+            player.vx = player.vy = 0
+            player.rect.topleft = (int(player.x), int(player.y))
+
 
         for entry in COIN_COORDS[:]:
             cr = pygame.Rect(entry[0]*TILE_SIZE, entry[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE)
@@ -412,10 +477,18 @@ def run_level(surface, game_state=None):
         isx, isy = int(sx), int(sy)
 
         # ── Draw ─────────────────────────────────────────────────────────────
+        # Fill with dark industrial background color as fallback
         surface.fill((18, 14, 22))
 
-        if bg_img:
+        # Draw background image if loaded
+        if bg_img and bg_img.get_width() > 0:
             surface.blit(bg_img, (0, 0))
+        else:
+            # Fallback: draw a simple gradient background
+            for y in range(SCREEN_H):
+                # Dark gray to slightly lighter gray gradient
+                shade = int(18 + (y / SCREEN_H) * 15)
+                pygame.draw.line(surface, (shade, shade - 4, shade - 8), (0, y), (SCREEN_W, y))
 
         # Animated conveyor belt overlay (drawn at row 10, over the A/B/C tiles)
         if platform_frames:
@@ -461,6 +534,9 @@ def run_level(surface, game_state=None):
 
         draw_hud(surface, game_state)
         player.draw(surface, isx, isy)
+        if bot:
+            bot.draw(surface, isx, isy)
+        draw_hud(surface, game_state)
         pygame.display.flip()
 
     return "quit"

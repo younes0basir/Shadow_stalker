@@ -49,40 +49,46 @@ TILE_MAPPING = {
     'C': "Tile_33.png",  # platform right
 }
 
-SOLID_TILES = set('123456789LRABCc')
+SOLID_TILES = set('123456789LRABC')
 
 # ── Map layout ─────────────────────────────────────────────────────────────
 # Legend:
 #  ' '  = air
-#  'C'  = coin pickup (drawn separately, not a tile)
+#  'c'  = coin pickup (drawn separately, not a tile)
 #  1-9  = ground/dirt tiles
 #  L/R  = slope tiles
 #  A/B/C = dark platform tiles
 
+MAP_W = 120
 MAP_LAYOUT = [
-    " " * 80,
-    " " * 80,
-    " " * 52 + "c" + " " * 4 + "c" + " " * 22,
-    " " * 48 + "c" + " " * 4 + "c" + " " * 4 + "c" + " " * 20,
-    " " * 42 + "ABC" + " c" + " " * 6 + "c" + " " * 4 + "c" + " " * 20,
-    " " * 42 + "ABC" + " " * 35,
-    " " * 80,
-    " " * 50 + "ABC" + " " * 8 + "ABC" + " " * 17,
-    " " * 50 + "ABC" + " " * 8 + "ABC" + " " * 17,
-    " " * 80,
-    " " * 28 + "123" + " " * 5 + "c" + " " * 4 + "c" + " " * 35,
-    " " * 28 + "456" + " " * 49,
-    " " * 80,
-    " " * 36 + "c  c  c" + " " * 4 + "c  c  c" + " " * 29,
-    " " * 15 + "L123" + " " * 8 + "123R" + " " * 45,
-    # main ground — left plateau  gap  middle pillar  gap  right ground
-    "12222222222222222223      12223        123      12222222222222222223",
+    " " * MAP_W,
+    " " * MAP_W,
+    " " * MAP_W,
+    " " * MAP_W,
+    (" " * 42 + "123" + " c" + " " * 6 + "c" + " " * 4 + "c").ljust(MAP_W),
+    (" " * 42 + "456").ljust(MAP_W),
+    (" " * 56 + "123c" + " " * 9 + "123c" + " " * 11 + "123c" + " " * 16 + "123c").ljust(MAP_W),
+    (" " * 50 + "L123R" + " " * 6 + "c" + " " * 6 + "L123R" + " " * 8 + "c" + " " * 8 + "L123R" + " " * 8 + "c" + " " * 7 + "L123R").ljust(MAP_W),
+    (" " * 50 + " 456 " + " " * 12 + " 456 " + " " * 16 + " 456 " + " " * 16 + " 456 ").ljust(MAP_W),
+    " " * MAP_W,
+    (" " * 28 + "123" + " " * 5 + "c" + " " * 4 + "c" + " " * 18 + "12223" + " " * 6 + "c" + " " * 7 + "12223" + " " * 6 + "c").ljust(MAP_W),
+    (" " * 28 + "456" + " " * 18 + "45556" + " " * 13 + "45556" + " " * 13 + "45556").ljust(MAP_W),
+    " " * MAP_W,
+    (" " * 36 + "c  c  c" + " " * 4 + "c  c  c" + " " * 10 + "c  c" + " " * 5 + "c").ljust(MAP_W),
+    (" " * 15 + "L123" + " " * 8 + "123R" + " " * 22 + "L123R" + " " * 10 + "c").ljust(MAP_W),
+    ("12222222222222222223      12223        123      12222222222222222223" + " " * 6 + "12223" + " " * 6 + "L12223R" + " " * 6 + "1222223").ljust(MAP_W),
+    # Right-side exit area - clear path for transition
+    " " * 110 + "122223",
+    " " * 110 + "455556",
+    " " * 110 + "788889",
 ]
 # Extend downward so no sky shows through
 for _i in range(25):
-    inner = "45555555555555555556      45556        456      45555555555555555556"
-    MAP_LAYOUT.append(inner)
-MAP_LAYOUT.append("78888888888888888889      78889        789      78888888888888888889")
+    inner = "45555555555555555556      45556        456      45555555555555555556" + "5" * 40 + "6"
+    MAP_LAYOUT.append(inner.ljust(MAP_W))
+MAP_LAYOUT.append(("78888888888888888889      78889        789      78888888888888888889" + "8" * 40 + "9").ljust(MAP_W))
+
+MAP_LAYOUT = [row[:MAP_W].ljust(MAP_W) for row in MAP_LAYOUT]
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 def load_image(path, scale=1):
@@ -172,54 +178,58 @@ for r, row in enumerate(MAP_LAYOUT):
 # Each entry: (image, pixel_x, tile_row)  — row is converted to y in loop below
 DECOR_RAW = []
 
-# LEFT SIDE — dead trees near the start
-DECOR_RAW.append((tree4, 0,              14))
-DECOR_RAW.append((tree3, 3*TILE_SIZE,    14))
-DECOR_RAW.append((tree2, 7*TILE_SIZE,    14))
+# LEFT SIDE — dead trees near the start (on main ground row 79)
+DECOR_RAW.append((tree4, 0,              15))
+DECOR_RAW.append((tree3, 3*TILE_SIZE,    15))
+DECOR_RAW.append((tree2, 7*TILE_SIZE,    15))
 
 # Grass tufts along left ground
 for gx in [1, 5, 9, 13, 16]:
-    DECOR_RAW.append((grass1, gx*TILE_SIZE, 14))
+    DECOR_RAW.append((grass1, gx*TILE_SIZE, 15))
 
 # Stone scatter left
-DECOR_RAW.append((stone1, 2*TILE_SIZE,   14))
-DECOR_RAW.append((stone2, 11*TILE_SIZE,  14))
+DECOR_RAW.append((stone1, 2*TILE_SIZE,   15))
+DECOR_RAW.append((stone2, 11*TILE_SIZE,  15))
 
-# Warning pointer sign near gap
-DECOR_RAW.append((ptr1, 21*TILE_SIZE, 14))
+# Warning pointer sign near gap (before the first gap at column 20)
+DECOR_RAW.append((ptr1, 18*TILE_SIZE, 15))
 
-# MIDDLE PILLAR — boxes stacked
-DECOR_RAW.append((box2, 36*TILE_SIZE,        15))
-DECOR_RAW.append((box1, 37*TILE_SIZE + 8,    15))
-DECOR_RAW.append((box3, 36*TILE_SIZE + 10,   14))  # top box
+# MIDDLE PILLAR — boxes stacked (on the middle pillar at column ~25)
+DECOR_RAW.append((box2, 25*TILE_SIZE,        15))
+DECOR_RAW.append((box1, 26*TILE_SIZE + 8,    15))
+DECOR_RAW.append((box3, 25*TILE_SIZE + 10,   14))  # top box
 
-# Mid platform — small trees + grass
-DECOR_RAW.append((tree1, 28*TILE_SIZE, 10))
-DECOR_RAW.append((grass2, 30*TILE_SIZE, 10))
-DECOR_RAW.append((stone3, 32*TILE_SIZE, 10))
+# Mid platform (row 73-74) — small trees + grass at column 28
+DECOR_RAW.append((tree1, 28*TILE_SIZE, 11))
+DECOR_RAW.append((grass2, 30*TILE_SIZE, 11))
+DECOR_RAW.append((stone3, 32*TILE_SIZE, 11))
 
-# Floating dark platforms — grass & stone on top
-DECOR_RAW.append((grass3, 42*TILE_SIZE, 4))
-DECOR_RAW.append((stone1,  44*TILE_SIZE, 4))
-DECOR_RAW.append((grass2,  60*TILE_SIZE, 7))
-DECOR_RAW.append((stone2,  62*TILE_SIZE, 7))
+# Floating dark platforms (row 67-68) — grass & stone on top at column 42
+DECOR_RAW.append((grass3, 42*TILE_SIZE, 6))
+DECOR_RAW.append((stone1,  44*TILE_SIZE, 6))
+
+# Second floating platform (row 70-71) — at columns 50 and 60
+DECOR_RAW.append((grass2,  50*TILE_SIZE, 9))
+DECOR_RAW.append((stone2,  52*TILE_SIZE, 9))
+DECOR_RAW.append((grass3,  60*TILE_SIZE, 9))
+DECOR_RAW.append((stone1,  62*TILE_SIZE, 9))
 
 # RIGHT GROUND — trees + warning pointer
-DECOR_RAW.append((tree2, 52*TILE_SIZE, 14))
-DECOR_RAW.append((tree3, 57*TILE_SIZE, 14))
-DECOR_RAW.append((tree4, 63*TILE_SIZE, 14))
+DECOR_RAW.append((tree2, 52*TILE_SIZE, 15))
+DECOR_RAW.append((tree3, 57*TILE_SIZE, 15))
+DECOR_RAW.append((tree4, 63*TILE_SIZE, 15))
 for gx in [50, 55, 60, 65]:
-    DECOR_RAW.append((grass1, gx*TILE_SIZE, 14))
-DECOR_RAW.append((stone3, 68*TILE_SIZE, 14))
-DECOR_RAW.append((ptr2,   70*TILE_SIZE, 14))
+    DECOR_RAW.append((grass1, gx*TILE_SIZE, 15))
+DECOR_RAW.append((stone3, 68*TILE_SIZE, 15))
+DECOR_RAW.append((ptr2,   70*TILE_SIZE, 15))
 
 # Additional decorations for improved terrain
-DECOR_RAW.append((tree1, 45*TILE_SIZE, 10))
-DECOR_RAW.append((grass2, 48*TILE_SIZE, 7))
-DECOR_RAW.append((grass3, 55*TILE_SIZE, 4))
-DECOR_RAW.append((stone1, 58*TILE_SIZE, 10))
+DECOR_RAW.append((tree1, 45*TILE_SIZE, 11))
+DECOR_RAW.append((grass2, 48*TILE_SIZE, 9))
+DECOR_RAW.append((grass3, 55*TILE_SIZE, 6))
+DECOR_RAW.append((stone1, 58*TILE_SIZE, 11))
 DECOR_RAW.append((box2, 62*TILE_SIZE + 8, 15))
-DECOR_RAW.append((ptr1, 40*TILE_SIZE, 14))
+DECOR_RAW.append((ptr1, 38*TILE_SIZE, 15))
 
 # Convert row → pixel y (bottom of image sits on ground row)
 decorations = []
@@ -298,7 +308,7 @@ class Player:
             self.frame_idx = 0
 
     # ── update ────────────────────────────────────────────────────────────
-    def update(self, dt, map_h):
+    def update(self, dt, map_w, map_h):
         # Clamp dt to prevent physics explosions on frame drops
         dt = min(dt, 0.05)
 
@@ -306,10 +316,6 @@ class Player:
         if keys[pygame.K_LEFT]  or keys[pygame.K_a]: self.vx = -self.speed; self.facing_right = False
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]: self.vx =  self.speed; self.facing_right = True
         else: self.vx = 0
-
-        # left boundary
-        if self.x < 0:
-            self.x = 0; self.vx = max(0, self.vx)
 
         if not self.on_ground and self.wall_jump_cd <= 0:
             self.on_wall_left  = self._check_wall('left')
@@ -331,6 +337,16 @@ class Player:
         for h in self._tiles_for(self.rect):
             if self.vx > 0: self.rect.right = h.left;  self.x = float(self.rect.x)
             elif self.vx < 0: self.rect.left = h.right; self.x = float(self.rect.x)
+        
+        # Boundary checks AFTER movement
+        if self.x < 0:
+            self.x = 0
+            self.rect.x = 0
+            self.vx = 0
+        
+        # Check if player reached the end of the map
+        if self.x > map_w - TILE_SIZE:
+            return "next"
 
         # Y movement
         self.y += self.vy * dt
@@ -360,8 +376,8 @@ class Player:
             self.rect.x = int(self.x)
             self.rect.y = int(self.y)
             self.vy = 0
-            return True  # signal: player fell off map
-        return False
+            return "fell"  # signal: player fell off map
+        return None
 
     def _update_state(self):
         new = 'idle'
@@ -430,21 +446,45 @@ def run_level(surface, game_state=None):
     if game_state is None:
         game_state = {"health": 3, "max_health": 3, "score": 0, "lives": 3}
 
-    player = Player(120, 340)
+    # Rebuild coin list so coins respawn on level re-entry
+    global COIN_COORDS
+    COIN_COORDS = []
+    for r, row in enumerate(MAP_LAYOUT):
+        for c, ch in enumerate(row):
+            if ch == 'c':
+                COIN_COORDS.append([c, r])
+
+    player = Player(120, 200)
     clock  = pygame.time.Clock()
     t      = 0.0
-    sx = sy = 0.0
-    running = True
+    # Initialize camera to player position immediately
+    sx = max(0, min(120 - SCREEN_W // 2, map_width - SCREEN_W))
+    sy = max(0, min(200 - SCREEN_H // 2, map_height - SCREEN_H))
+    
+    # AI Bot
+    bot = None
+    if game_state.get("game_mode") == "kids":
+        pass
+    else:
+        try:
+            from ai.mask_dude_bot import MaskDudeBot
+            # Use current bot position if it exists, otherwise spawn behind
+            start_x = game_state.get("bot_x", -100)
+            start_y = game_state.get("bot_y", 200)
+            bot = MaskDudeBot(start_x, start_y, TILE_SIZE, MAP_LAYOUT, SOLID_TILES)
+        except ImportError:
+            pass
 
+    running = True
     while running:
         dt = clock.tick(60) / 1000.0
         t += dt
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                return "quit"
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: running = False
+                if event.key == pygame.K_ESCAPE: return "quit"
                 elif event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w): player.jump()
             elif event.type == pygame.VIDEORESIZE:
                 SCREEN_W, SCREEN_H = event.w, event.h
@@ -455,12 +495,27 @@ def run_level(surface, game_state=None):
                     if img.get_width() > 1:
                         bg_layers.append(pygame.transform.scale(img, (SCREEN_W, SCREEN_H)))
 
-        fell_off = player.update(dt, map_height)
+        status = player.update(dt, map_width, map_height)
+        
+        # Update Bot
+        if bot:
+            bot.set_target(player)
+            bot.update(dt, map_height)
+            # Save bot position to game_state for map-to-map persistence
+            game_state["bot_x"] = bot.x
+            game_state["bot_y"] = bot.y
+            
+            if bot.rect.colliderect(player.rect):
+                # Bot caught player -> Game Over
+                return "game_over"
+        
+        if status == "next":
+            return "next"
+        fell_off = (status == "fell")
 
-        # coin collection
+        # coin collection - using same approach as industrial_zone_map.py
         for entry in COIN_COORDS[:]:
-            cx, cy = entry
-            cr = pygame.Rect(cx * TILE_SIZE, cy * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            cr = pygame.Rect(entry[0]*TILE_SIZE, entry[1]*TILE_SIZE, TILE_SIZE, TILE_SIZE)
             if player.rect.colliderect(cr):
                 game_state["score"] += 10
                 COIN_COORDS.remove(entry)
@@ -507,7 +562,7 @@ def run_level(surface, game_state=None):
             if -img.get_width() < bx < SCREEN_W and -img.get_height() < by < SCREEN_H:
                 surface.blit(img, (bx, by))
 
-        # animated coins
+        # animated coins - no floating animation to match collision
         if coin_frames:
             cf = coin_frames[int(t * 8) % len(coin_frames)]
             for entry in COIN_COORDS:
@@ -515,8 +570,7 @@ def run_level(surface, game_state=None):
                 bx = cx * TILE_SIZE - sx + (TILE_SIZE - cf.get_width())  // 2
                 by = cy * TILE_SIZE - sy + (TILE_SIZE - cf.get_height()) // 2
                 if -32 < bx < SCREEN_W and -32 < by < SCREEN_H:
-                    # gentle float
-                    surface.blit(cf, (bx, by + int(math.sin(t * 4 + cx) * 3)))
+                    surface.blit(cf, (bx, by))
 
         # animated cards on the right platform
         if card_frames:
@@ -528,6 +582,8 @@ def run_level(surface, game_state=None):
 
         draw_hud(surface, game_state)
         player.draw(surface, int(sx), int(sy))
+        if bot:
+            bot.draw(surface, int(sx), int(sy))
         pygame.display.flip()
 
     return "quit"

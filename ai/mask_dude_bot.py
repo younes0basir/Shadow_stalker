@@ -15,10 +15,10 @@ PARENT_DIR = os.path.dirname(ROOT)
 MASK_DUDE_PATH = os.path.join(PARENT_DIR, "assets", "MainCharacters", "MaskDude")
 
 # Physics constants for bot (matching player capabilities)
-BOT_SPEED = 220       # Same as player
-BOT_JUMP_FORCE = -460  # Same as player
-BOT_GRAVITY = 1200     # Same as player
-BOT_DETECTION_RANGE = 600  # Pixels - how far bot can "see" player
+BOT_SPEED = 180       # Slower than player (220-280) for "not too hard"
+BOT_JUMP_FORCE = -420  # Slightly lower jump
+BOT_GRAVITY = 1200
+BOT_DETECTION_RANGE = 500  # Pixels - how far bot can "see" player
 BOT_JUMP_REACH = 80   # Pixels - gap size bot will attempt to jump
 
 
@@ -47,22 +47,6 @@ class MaskDudeBot:
     """AI Bot that chases the player through the level."""
     
     def __init__(self, x, y, tile_size=32, map_layout=None, solid_tiles=None):
-        # Load animations (same structure as player)
-        scale = 1.5
-        self.anims = {
-            'idle': load_spritesheet(os.path.join(MASK_DUDE_PATH, "idle.png"), 32, 32, scale),
-            'run': load_spritesheet(os.path.join(MASK_DUDE_PATH, "run.png"), 32, 32, scale),
-            'jump': load_spritesheet(os.path.join(MASK_DUDE_PATH, "jump.png"), 32, 32, scale),
-            'fall': load_spritesheet(os.path.join(MASK_DUDE_PATH, "fall.png"), 32, 32, scale),
-            'double_jump': load_spritesheet(os.path.join(MASK_DUDE_PATH, "double_jump.png"), 32, 32, scale),
-            'hit': load_spritesheet(os.path.join(MASK_DUDE_PATH, "hit.png"), 32, 32, scale),
-            'wall_jump': load_spritesheet(os.path.join(MASK_DUDE_PATH, "wall_jump.png"), 32, 32, scale),
-        }
-        
-        self.state = 'idle'
-        self.frame_idx = 0
-        self.facing_right = True
-        
         # Position and physics
         self.x = float(x)
         self.y = float(y)
@@ -70,7 +54,17 @@ class MaskDudeBot:
         self.map_layout = map_layout
         self.solid_tiles = solid_tiles or set()
         
+        # Animation
+        self.anims = {}
+        self.state = 'idle'
+        self.frame_idx = 0
+        self.anim_timer = 0
+        self.load_animations()
+        
+        self.facing_right = True
+        
         # Hitbox (slightly smaller than visual)
+        scale = 1.5
         self.rect = pygame.Rect(x, y, 16 * scale, 24 * scale)
         
         self.vx = 0
@@ -98,6 +92,25 @@ class MaskDudeBot:
     def set_target(self, player):
         """Set the player as chase target."""
         self.target = player
+        
+    def load_animations(self):
+        scale = 1.5
+        for s in ('idle', 'run', 'jump', 'fall', 'double_jump', 'hit', 'wall_jump'):
+            p = os.path.join(MASK_DUDE_PATH, f"{s}.png")
+            if os.path.exists(p):
+                sheet = pygame.image.load(p).convert_alpha()
+                frames = []
+                fw = 32
+                for x in range(0, sheet.get_width(), fw):
+                    s_surf = pygame.Surface((fw, fw), pygame.SRCALPHA)
+                    s_surf.blit(sheet, (0, 0), (x, 0, fw, fw))
+                    s_surf = pygame.transform.scale(s_surf, (int(fw*scale), int(fw*scale)))
+                    # Tint red to distinguish from player
+                    tint = pygame.Surface(s_surf.get_size(), pygame.SRCALPHA)
+                    tint.fill((255, 50, 50, 100)) # Stronger red stalker tint
+                    s_surf.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                    frames.append(s_surf)
+                self.anims[s] = frames
         
     def get_collisions(self):
         """Check collision with solid tiles."""

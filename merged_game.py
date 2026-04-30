@@ -7,6 +7,7 @@ ROOT = os.path.dirname(__file__)
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, "maps"))
 sys.path.insert(0, os.path.join(ROOT, "ai"))
+sys.path.insert(0, os.path.join(ROOT, "core"))
 
 # Import AI bot
 try:
@@ -20,6 +21,14 @@ pygame.init()
 SCREEN_W, SCREEN_H = 1280, 720
 screen = pygame.display.set_mode((SCREEN_W, SCREEN_H), pygame.RESIZABLE)
 pygame.display.set_caption("Shadow Stalker - Merged Zones")
+
+# Import game over screen
+try:
+    from core.game_over import show_game_over
+    GAME_OVER_AVAILABLE = True
+except ImportError:
+    GAME_OVER_AVAILABLE = False
+    print("Warning: Game over screen not available")
 
 # Import map modules
 try:
@@ -406,20 +415,40 @@ def main():
                     running = False
                 elif event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     if game_over and not in_transition:
-                        # Restart game (only if not in transition)
-                        game_over = False
-                        game_state = {"health": 3, "max_health": 3, "score": 0, "lives": 3}
-                        current_map = map_manager.get_current_map()
-                        player = Player(*current_map['spawn'])
-                        if AI_AVAILABLE:
-                            enemy_spawn_x = min(current_map['width'] - 100, player.x + 300)
-                            enemy = MaskDudeBot(enemy_spawn_x, player.y, tile_size=TILE_SIZE, 
-                                               map_layout=current_map['layout'], 
-                                               solid_tiles=current_map['solid'])
-                            enemy.set_target(player)
+                        # Show game over screen or restart
+                        if GAME_OVER_AVAILABLE:
+                            result = show_game_over(screen, game_state)
+                            if result == "restart":
+                                game_over = False
+                                game_state = {"health": 3, "max_health": 3, "score": 0, "lives": 3}
+                                current_map = map_manager.get_current_map()
+                                player = Player(*current_map['spawn'])
+                                if AI_AVAILABLE:
+                                    enemy_spawn_x = min(current_map['width'] - 100, player.x + 300)
+                                    enemy = MaskDudeBot(enemy_spawn_x, player.y, tile_size=TILE_SIZE, 
+                                                       map_layout=current_map['layout'], 
+                                                       solid_tiles=current_map['solid'])
+                                    enemy.set_target(player)
+                                else:
+                                    enemy = None
+                                sx = sy = 0.0
+                            else:
+                                running = False
                         else:
-                            enemy = None
-                        sx = sy = 0.0
+                            # Fallback to simple restart
+                            game_over = False
+                            game_state = {"health": 3, "max_health": 3, "score": 0, "lives": 3}
+                            current_map = map_manager.get_current_map()
+                            player = Player(*current_map['spawn'])
+                            if AI_AVAILABLE:
+                                enemy_spawn_x = min(current_map['width'] - 100, player.x + 300)
+                                enemy = MaskDudeBot(enemy_spawn_x, player.y, tile_size=TILE_SIZE, 
+                                                   map_layout=current_map['layout'], 
+                                                   solid_tiles=current_map['solid'])
+                                enemy.set_target(player)
+                            else:
+                                enemy = None
+                            sx = sy = 0.0
                     else:
                         player.jump()
             elif event.type == pygame.VIDEORESIZE:
@@ -624,8 +653,8 @@ def main():
         if not game_over and enemy and AI_AVAILABLE:
             enemy.draw(screen, isx, isy)
         
-        # Game over screen
-        if game_over:
+        # Game over screen (fallback if new system not available)
+        if game_over and not GAME_OVER_AVAILABLE:
             overlay = pygame.Surface((SCREEN_W, SCREEN_H), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 180))
             screen.blit(overlay, (0, 0))

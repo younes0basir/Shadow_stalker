@@ -49,26 +49,59 @@ TILE_MAPPING = {
     'W': "Tile_22.png",
 }
 
-SOLID_TILES = set('123456789TLR<>/\\BcW')
+SOLID_TILES = set('123456789TLR<>BcW')
+SLOPE_TILES = set('/\\')
+
+MAP_W = 80
 
 MAP_LAYOUT = [
-    " " * 80,
-    " " * 80,
-    " " * 44 + "C" + " " * 9 + "C" + " " * 25,
-    " " * 39 + "C" + " " * 9 + "C" + " " * 9 + "C" + " " * 22,
-    " " * 28 + "122223" + "   C" + " " * 9 + "C" + " " * 9 + "C" + " " * 23,
-    " " * 28 + "455556" + "        C" + "    12223   1223" + " " * 12 + "12223" + " " * 8,
-    " " * 28 + "788889" + "             45556   4556" + " " * 12 + "45556" + " " * 8,
-    " " * 80,
-    " " * 35 + "122223" + " " * 8 + "122223" + " " * 24,
-    " " * 24 + "122223" + "             455556" + " " * 8 + "455556" + " " * 23,
-    " " * 18 + "/455556\\" + "             455556" + " " * 8 + "/455556\\" + " " * 20,
-    "12222222222222222222222455556             455556   4555555555555555556" + "   45555555555555555556",
+    " " * MAP_W,
+    " " * MAP_W,
+    # Spawn platform - aligned with player start position
+    " " * 5 + "1111122223" + "C" + "122223" + "C" + "122223" + "C" + "122223" + "C" + "122223" + " " * 45,
+    " " * 5 + "455556" + "455556" + "455556" + "455556" + "455556" + " " * 50,
+    " " * 5 + "788889" + "788889" + "788889" + "788889" + "788889" + " " * 50,
+    " " * MAP_W,
+    # First progression - small gaps with coins
+    " " * 8 + "12223" + "C" + " " + "C" + "12223" + "C" + "12223" + "C" + "12223" + "C" + " " + "C" + "12223" + " " * 40,
+    " " * 8 + "45556" + " " + "45556" + "45556" + " " + "45556" + "45556" + " " + "45556" + " " * 40,
+    " " * 8 + "78889" + " " + "78889" + "78889" + " " + "78889" + "78889" + " " + "78889" + " " * 40,
+    # Medium progression - moderate gaps with rewards
+    " " * 12 + "12223" + "C" + "  " + "C" + "12223" + "C" + "12223" + "C" + "  " + "C" + "12223" + "C" + "12223" + "C" + "  " + "C" + "12223" + " " * 35,
+    " " * 12 + "45556" + "  " + "45556" + "45556" + "  " + "45556" + "45556" + "  " + "45556" + " " * 40,
+    " " * 12 + "78889" + "  " + "78889" + "78889" + "  " + "78889" + "78889" + "  " + "78889" + " " * 40,
+    # Hard progression - larger gaps with slopes and coins
+    " " * 16 + "/4556\\" + "C" + "   " + "C" + "12223" + "C" + "   " + "C" + "/4556\\" + "C" + "   " + "C" + "12223" + "C" + "   " + "C" + "/4556\\" + " " * 20,
+    " " * 16 + "12223" + "   " + "45556" + "   " + "12223" + "   " + "45556" + "   " + "12223" + " " * 30,
+    " " * 16 + "45556" + "   " + "78889" + "   " + "45556" + "   " + "78889" + "   " + "45556" + " " * 30,
+    # Challenge section - multiple paths with rewards
+    " " * 20 + "12223" + "C" + "    " + "C" + "12223" + "C" + "    " + "C" + "12223" + "C" + "    " + "C" + "12223" + "C" + "    " + "C" + "12223" + " " * 15,
+    " " * 20 + "45556" + "    " + "45556" + "    " + "45556" + "    " + "45556" + "    " + "45556" + " " * 25,
+    " " * 20 + "78889" + "    " + "78889" + "    " + "78889" + "    " + "78889" + "    " + "78889" + " " * 25,
+    # Final stretch - enhanced descending path with varied terrain
+    " " * 25 + "122223" + "C" + "122223" + "C" + "122223" + "C" + "122223" + "C" + "122223" + "C" + "122223" + "C" + "122223" + " " * 10,
+    " " * 28 + "45556" + "C" + "45556" + "C" + "45556" + "C" + "45556" + "C" + "45556" + "C" + "45556" + "C" + "45556" + " " * 12,
+    " " * 32 + "78889" + "C" + "  " + "C" + "78889" + "C" + "  " + "C" + "78889" + "C" + "  " + "C" + "78889" + " " * 15,
+    " " * 36 + "/4556\\" + "C" + "C" + "   " + "C" + "/4556\\" + "C" + "C" + "   " + "C" + "/4556\\" + "C" + "C" + "   " + "C" + "/4556\\",
+    " " * 40 + "12223" + "C" + "  " + "C" + "12223" + "C" + "  " + "C" + "12223" + "C" + "  " + "C" + "12223" + "C" + "  " + "C" + "12223",
+    " " * 44 + "45556" + "C" + "   " + "C" + "45556" + "C" + "   " + "C" + "45556" + "C" + "   " + "C" + "45556" + "C" + "   " + "C" + "45556",
+    " " * 48 + "\\\\4555/" + "C" + "  " + "C" + "\\\\4555/" + "C" + "  " + "C" + "\\\\4555/" + "C" + "  " + "C" + "\\\\4555/" + "C" + "  " + "C" + "\\\\4555/",
+    ("12222222222222222222222455556" + "C" + "4555555555555555556" + "C" + "4555555555555555556" + "C" + "4555555555555555556" + "C" + "4555555555555555556" + "C" + "4555555555555555556"),
 ]
-for _i in range(25):
-    center = "1223" if _i == 0 else "4556"
-    MAP_LAYOUT.append("45555555555555555555555555556   " + center + "      455556   4555555555555555556" + "   45555555555555555556")
-MAP_LAYOUT.append("78888888888888888888888888889   7889      788889   7888888888888888889" + "   78888888888888888889")
+# Enhanced ending - varied ground terrain with rewards
+MAP_LAYOUT.append(("12222222222222222222222455556" + "C" + "4555555555555555556" + "C" + "4555555555555555556" + "C" + "4555555555555555556" + "C" + "4555555555555555556" + "C" + "4555555555555555556").ljust(MAP_W))
+MAP_LAYOUT.append(("78888888888888888888888888889" + "C" + "78888888888888888889" + "C" + "78888888888888888889" + "C" + "78888888888888888889" + "C" + "78888888888888888889" + "C" + "78888888888888888889").ljust(MAP_W))
+MAP_LAYOUT.append(("12222222222222222222222455556" + " " + "C" + "4555555555555555556" + " " + "C" + "4555555555555555556" + " " + "C" + "4555555555555555556" + " " + "C" + "4555555555555555556").ljust(MAP_W))
+MAP_LAYOUT.append(("78888888888888888888888888889" + " " + "C" + "78888888888888888889" + " " + "C" + "78888888888888888889" + " " + "C" + "78888888888888888889" + " " + "C" + "78888888888888888889").ljust(MAP_W))
+MAP_LAYOUT.append(("12222222222222222222222455556" + "C" + "C" + "4555555555555555556" + "C" + "C" + "4555555555555555556" + "C" + "C" + "4555555555555555556" + "C" + "C" + "4555555555555555556").ljust(MAP_W))
+MAP_LAYOUT.append(("78888888888888888888888888889" + "C" + "C" + "78888888888888888889" + "C" + "C" + "78888888888888888889" + "C" + "C" + "78888888888888888889" + "C" + "C" + "78888888888888888889").ljust(MAP_W))
+
+# Exit area - clear path for transition to Industrial Zone
+MAP_LAYOUT.append(" " * 70 + "122223")
+MAP_LAYOUT.append(" " * 70 + "455556")
+MAP_LAYOUT.append(" " * 70 + "788889")
+
+MAP_LAYOUT = [row[:MAP_W].ljust(MAP_W) for row in MAP_LAYOUT]
 
 
 
@@ -165,61 +198,101 @@ coin_frames = load_spritesheet(a_path("Money.png"), 24, 24, scale=1.0)
 fountain_frames = load_spritesheet(a_path("Fountain.png"), 64, 64, scale=1.0) if a_path("Fountain.png") else [fountain]
 
 decorations = [] 
+bg_decorations = []
 
-# Add explicitly matching the reference image layout
+# Enhanced decorations with visual variety and interactive elements
 EXPLICIT_OBJS = []
+BACKGROUND_OBJS = []
 
-# Left side tree and background fence (only behind ramps)
-EXPLICIT_OBJS.append((tree1, -1*TILE_SIZE, 11))
-EXPLICIT_OBJS.append((fence_seg, 3*TILE_SIZE, 11))
-for i in range(4, 21):
-    EXPLICIT_OBJS.append((fence_seg_mid, i*TILE_SIZE, 11))
-EXPLICIT_OBJS.append((fence_seg_end, 21*TILE_SIZE, 11))
+# Spawn platform - welcoming starting area
+BACKGROUND_OBJS.append((tree1, 6*TILE_SIZE, 2))
+EXPLICIT_OBJS.append((bush1, 10*TILE_SIZE, 2))
+BACKGROUND_OBJS.append((tree2, 14*TILE_SIZE, 2))
+EXPLICIT_OBJS.append((bush2, 18*TILE_SIZE, 2))
+EXPLICIT_OBJS.append((stone1, 22*TILE_SIZE, 2))
 
-# Skateboard ramps (gap in between)
-EXPLICIT_OBJS.append((sb2, 4*TILE_SIZE + 10, 11))
-EXPLICIT_OBJS.append((ramp1, 5*TILE_SIZE, 11))
-EXPLICIT_OBJS.append((sb1, 12*TILE_SIZE + 16, 11))
+# First progression - guided path with rewards
+EXPLICIT_OBJS.append((box_img, 8*TILE_SIZE + 5, 6))
+EXPLICIT_OBJS.append((bush3, 16*TILE_SIZE, 6))
+EXPLICIT_OBJS.append((stone2, 24*TILE_SIZE, 6))
+BACKGROUND_OBJS.append((tree1, 32*TILE_SIZE, 6))
+
+# Medium progression - increasing complexity
+EXPLICIT_OBJS.append((ramp1, 12*TILE_SIZE, 9))
+EXPLICIT_OBJS.append((box_img, 20*TILE_SIZE + 5, 9))
+EXPLICIT_OBJS.append((stone3, 28*TILE_SIZE, 9))
+EXPLICIT_OBJS.append((bush1, 36*TILE_SIZE, 9))
+BACKGROUND_OBJS.append((tree2, 44*TILE_SIZE, 9))
+
+# Hard progression - challenging terrain with obstacles
 EXPLICIT_OBJS.append((ramp2, 16*TILE_SIZE, 11))
-EXPLICIT_OBJS.append((bush1, 4*TILE_SIZE, 11))
-EXPLICIT_OBJS.append((bush2, 22*TILE_SIZE, 11))
+EXPLICIT_OBJS.append((box_img, 22*TILE_SIZE + 5, 11))
+EXPLICIT_OBJS.append((ramp1, 28*TILE_SIZE, 11))
+EXPLICIT_OBJS.append((stone1, 34*TILE_SIZE, 11))
+EXPLICIT_OBJS.append((box_img, 40*TILE_SIZE + 10, 11))
 
-# Medium tree on slope
-EXPLICIT_OBJS.append((tree2, 25*TILE_SIZE, 9))
+# Challenge section - multiple paths with choices
+BACKGROUND_OBJS.append((tree1, 20*TILE_SIZE, 13))
+EXPLICIT_OBJS.append((box_img, 28*TILE_SIZE + 5, 13))
+EXPLICIT_OBJS.append((ramp2, 36*TILE_SIZE, 13))
+EXPLICIT_OBJS.append((box_img, 44*TILE_SIZE + 10, 13))
+EXPLICIT_OBJS.append((bush2, 52*TILE_SIZE, 13))
 
-# Bushes on the floating platform
-EXPLICIT_OBJS.append((bush2, 28*TILE_SIZE, 4))
-EXPLICIT_OBJS.append((bush3, 30*TILE_SIZE, 4))
-EXPLICIT_OBJS.append((bush1, 31*TILE_SIZE + 10, 4))
+# Final stretch - start of descent
+EXPLICIT_OBJS.append((bench, 25*TILE_SIZE, 14))
+EXPLICIT_OBJS.append((fountain, 30*TILE_SIZE, 14))
+EXPLICIT_OBJS.append((garbage, 35*TILE_SIZE, 14))
+EXPLICIT_OBJS.append((bench, 40*TILE_SIZE, 14))
 
-# Ladder hanging from floating platform
-for i in range(4, 11):
-    EXPLICIT_OBJS.append((ladder, 32*TILE_SIZE + 16, i))
+# Descending path - getting lower
+BACKGROUND_OBJS.append((tree1, 28*TILE_SIZE, 15))
+EXPLICIT_OBJS.append((box_img, 34*TILE_SIZE + 5, 15))
+BACKGROUND_OBJS.append((tree2, 40*TILE_SIZE, 15))
+EXPLICIT_OBJS.append((bush1, 46*TILE_SIZE, 15))
 
-# Rocks in the pit and on right floating platforms
-EXPLICIT_OBJS.append((stone4, 32*TILE_SIZE, 12)) 
-EXPLICIT_OBJS.append((stone2, 47*TILE_SIZE, 5)) 
-EXPLICIT_OBJS.append((stone3, 56*TILE_SIZE, 5)) 
-EXPLICIT_OBJS.append((stone1, 62*TILE_SIZE, 10)) 
+# Slope descent - using slope physics
+EXPLICIT_OBJS.append((ramp1, 32*TILE_SIZE, 16))
+EXPLICIT_OBJS.append((box_img, 38*TILE_SIZE + 5, 16))
+EXPLICIT_OBJS.append((ramp2, 44*TILE_SIZE, 16))
+EXPLICIT_OBJS.append((stone1, 50*TILE_SIZE, 16))
 
-# Boxes on the middle pillar
-EXPLICIT_OBJS.append((box_img, 44*TILE_SIZE + 5, 8))
-EXPLICIT_OBJS.append((box_img, 45*TILE_SIZE + 10, 8))
-# top box
-EXPLICIT_OBJS.append((box_img, 44*TILE_SIZE + 16, 7))
+# Final descent - scattered platforms
+BACKGROUND_OBJS.append((tree1, 36*TILE_SIZE, 17))
+EXPLICIT_OBJS.append((box_img, 42*TILE_SIZE + 10, 17))
+EXPLICIT_OBJS.append((bush2, 48*TILE_SIZE, 17))
+EXPLICIT_OBJS.append((stone2, 54*TILE_SIZE, 17))
 
-# Fountain area on the right
-EXPLICIT_OBJS.append((bench, 53*TILE_SIZE, 10))
-EXPLICIT_OBJS.append((bench, 66*TILE_SIZE, 10))
-EXPLICIT_OBJS.append((bush2, 69*TILE_SIZE, 10))
-EXPLICIT_OBJS.append((garbage, 65*TILE_SIZE, 10))
+# Enhanced ground level - completion area with more variety
+BACKGROUND_OBJS.append((tree2, 40*TILE_SIZE, 18))
+EXPLICIT_OBJS.append((bench, 45*TILE_SIZE, 18))
+EXPLICIT_OBJS.append((fountain, 50*TILE_SIZE, 18))
+EXPLICIT_OBJS.append((ladder, 55*TILE_SIZE, 18))
+BACKGROUND_OBJS.append((tree1, 58*TILE_SIZE, 18))
+EXPLICIT_OBJS.append((bush1, 65*TILE_SIZE, 18))
+EXPLICIT_OBJS.append((stone3, 70*TILE_SIZE, 18))
+BACKGROUND_OBJS.append((tree2, 75*TILE_SIZE, 18))
 
-# Additional decorations for improved terrain
-EXPLICIT_OBJS.append((tree1, 48*TILE_SIZE, 10))
-EXPLICIT_OBJS.append((stone1, 55*TILE_SIZE, 8))
-EXPLICIT_OBJS.append((stone2, 60*TILE_SIZE, 10))
-EXPLICIT_OBJS.append((bush3, 52*TILE_SIZE, 4))
-EXPLICIT_OBJS.append((box_img, 58*TILE_SIZE + 5, 8))
+# Additional ground decorations for enhanced ending
+EXPLICIT_OBJS.append((box_img, 42*TILE_SIZE + 5, 19))
+EXPLICIT_OBJS.append((bush2, 48*TILE_SIZE, 19))
+EXPLICIT_OBJS.append((stone1, 54*TILE_SIZE, 19))
+EXPLICIT_OBJS.append((bush3, 62*TILE_SIZE, 19))
+EXPLICIT_OBJS.append((box_img, 68*TILE_SIZE + 5, 19))
+
+# Final celebration area
+EXPLICIT_OBJS.append((bench, 44*TILE_SIZE, 20))
+EXPLICIT_OBJS.append((fountain, 52*TILE_SIZE, 20))
+EXPLICIT_OBJS.append((garbage, 58*TILE_SIZE, 20))
+EXPLICIT_OBJS.append((ladder, 64*TILE_SIZE, 20))
+
+for obj_img, col, row in BACKGROUND_OBJS:
+    if obj_img and obj_img.get_width() > 0:
+        ox = col
+        if row > 0:
+            oy = row * TILE_SIZE - obj_img.get_height()
+        else:
+            oy = 0
+        bg_decorations.append((obj_img, ox, oy))
 
 for obj_img, col, row in EXPLICIT_OBJS:
     if obj_img and obj_img.get_width() > 0:
@@ -304,6 +377,25 @@ class Player:
                     hits.append(pygame.Rect(col*TILE_SIZE, row*TILE_SIZE, TILE_SIZE, TILE_SIZE))
         return hits
 
+    def get_slope_height(self, x, y):
+        """Get the ground height from slope tiles at given position."""
+        col = int(x // TILE_SIZE)
+        row = int(y // TILE_SIZE)
+        
+        if 0 <= row < len(MAP_LAYOUT) and 0 <= col < len(MAP_LAYOUT[row]):
+            tile = MAP_LAYOUT[row][col]
+            if tile in SLOPE_TILES:
+                # Calculate position within tile (0.0 to 1.0)
+                local_x = (x % TILE_SIZE) / TILE_SIZE
+                
+                if tile == '/':  # Slope up from left to right (low left, high right)
+                    # Height goes from 0 at left to TILE_SIZE at right
+                    return TILE_SIZE * local_x
+                elif tile == '\\':  # Slope down from left to right (high left, low right)
+                    # Height goes from TILE_SIZE at left to 0 at right
+                    return TILE_SIZE * (1 - local_x)
+        return None
+
     def jump(self):
         if self.on_wall_left and not self.on_ground:
             self.vy = self.jump_force
@@ -383,25 +475,55 @@ class Player:
         
         self.y += self.vy * dt
         self.rect.y = int(self.y)
-        for hit in self.get_collisions():
-            if self.vy > 0: self.rect.bottom = hit.top; self.y = float(self.rect.y); self.vy = 0
-            elif self.vy < 0: self.rect.top = hit.bottom; self.y = float(self.rect.y); self.vy = 0
-
-        self.rect.y += 1
-        ground_hits = self.get_collisions()
-        self.rect.y -= 1
         
-        if len(ground_hits) > 0 and self.vy >= 0:
-            self.on_ground = True
-            self.jump_count = 0
-        else:
-            self.on_ground = False
+        # Check for slope collision first - check at multiple points for better detection
+        on_slope = False
+        check_points = [self.rect.left, self.rect.centerx, self.rect.right]
+        
+        for check_x in check_points:
+            slope_height = self.get_slope_height(check_x, self.rect.bottom)
+            
+            if slope_height is not None and self.vy >= 0:
+                tile_row = int(self.rect.bottom // TILE_SIZE)
+                tile_y = tile_row * TILE_SIZE
+                ground_y = tile_y + TILE_SIZE - slope_height
+                
+                if self.rect.bottom >= ground_y - 10:  # Tolerance for slope detection
+                    self.rect.bottom = ground_y
+                    self.y = float(self.rect.y)
+                    self.vy = 0
+                    on_slope = True
+                    self.on_ground = True
+                    self.jump_count = 0
+                    break
+        
+        # Regular solid tile collisions
+        if not on_slope:
+            for hit in self.get_collisions():
+                if self.vy > 0: self.rect.bottom = hit.top; self.y = float(self.rect.y); self.vy = 0
+                elif self.vy < 0: self.rect.top = hit.bottom; self.y = float(self.rect.y); self.vy = 0
+
+        # Ground check (probe method)
+        if not on_slope:
+            self.rect.y += 1
+            ground_hits = self.get_collisions()
+            self.rect.y -= 1
+            
+            if len(ground_hits) > 0 and self.vy >= 0:
+                self.on_ground = True
+                self.jump_count = 0
+            else:
+                self.on_ground = False
 
         self.update_state()
         if self.rect.y > map_h:
             self.y = 0.0
             self.vy = 0
             self.x = float(100)
+            return "fell"
+        
+        if self.x > (len(MAP_LAYOUT[0]) * TILE_SIZE) - TILE_SIZE:
+            return "next"
 
         anim_speed = 20 if self.state == 'run' else 12 
         self.frame_idx += anim_speed * dt
@@ -479,15 +601,39 @@ def run_level(surface, game_state=None):
     if game_state is None:
         game_state = {"health": 3, "max_health": 3, "score": 0, "lives": 3}
 
-    player = Player(120, 200)
+    # Rebuild coin list so coins respawn on level re-entry
+    global CHEST_COORDS
+    CHEST_COORDS = []
+    for r, row in enumerate(MAP_LAYOUT):
+        for c, char in enumerate(row):
+            if char == 'C':
+                CHEST_COORDS.append((c, r))
+
+    player = Player(220, 64)
+    # 64px is approx row 2 (32*2), moved slightly right to 220
 
     clock = pygame.time.Clock()
     frame_time = 0
-    scroll_x = 0
-    scroll_y = 0
+    # Initialize camera to player position immediately
+    scroll_x = max(0, min(220 - SCREEN_W // 2, map_width - SCREEN_W))
+    scroll_y = max(0, min(64 - SCREEN_H // 2, map_height - SCREEN_H))
     
-    run = True
-    while run:
+    # AI Bot
+    bot = None
+    if game_state.get("game_mode") == "kids":
+        pass
+    else:
+        try:
+            from ai.mask_dude_bot import MaskDudeBot
+            # Use current bot position if it exists, otherwise spawn behind
+            start_x = game_state.get("bot_x", -100)
+            start_y = game_state.get("bot_y", 200)
+            bot = MaskDudeBot(start_x, start_y, TILE_SIZE, MAP_LAYOUT, SOLID_TILES)
+        except ImportError:
+            pass
+
+    running = True
+    while running:
         dt = clock.tick(60) / 1000.0
         frame_time += dt
 
@@ -495,10 +641,10 @@ def run_level(surface, game_state=None):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                return "quit"
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    run = False
+                    return "quit"
                 elif event.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                     player.jump()
             elif event.type == pygame.VIDEORESIZE:
@@ -511,7 +657,22 @@ def run_level(surface, game_state=None):
                         bg_layers[i] = pygame.transform.scale(bg_img, (SCREEN_W, SCREEN_H))
 
         # Update Player physics
-        player.update(dt, map_height)
+        status = player.update(dt, map_height)
+        
+        # Update Bot
+        if bot:
+            bot.set_target(player)
+            bot.update(dt, map_height)
+            # Save bot position to game_state for map-to-map persistence
+            game_state["bot_x"] = bot.x
+            game_state["bot_y"] = bot.y
+            
+            if bot.rect.colliderect(player.rect):
+                # Bot caught player -> Game Over
+                return "game_over"
+        
+        if status == "next":
+            return "next"
         
         # Coin collection
         for mcx, mcy in CHEST_COORDS[:]:
@@ -520,7 +681,7 @@ def run_level(surface, game_state=None):
                 game_state["score"] += 10
                 CHEST_COORDS.remove((mcx, mcy))
 
-        if player.rect.y > map_height:
+        if status == "fell":
             game_state["health"] = max(0, game_state["health"] - 1)
             if game_state["health"] <= 0:
                 game_state["health"] = game_state["max_health"]
@@ -546,8 +707,8 @@ def run_level(surface, game_state=None):
             if rel_x > 0:
                 surface.blit(bg, (bg.get_width() - rel_x, parallax_y))
 
-        # Decorations
-        for img, ox, oy in decorations:
+        # Background decorations (draw before tiles)
+        for img, ox, oy in bg_decorations:
             if ox - scroll_x > SCREEN_W or ox + img.get_width() - scroll_x < 0: continue
             if oy - scroll_y > SCREEN_H or oy + img.get_height() - scroll_y < 0: continue
             surface.blit(img, (ox - scroll_x, oy - scroll_y))
@@ -565,6 +726,12 @@ def run_level(surface, game_state=None):
 
                 if symbol in loaded_tiles:
                     surface.blit(loaded_tiles[symbol], (x, y))
+
+        # Decorations (draw after tiles so objects appear on top of terrain)
+        for img, ox, oy in decorations:
+            if ox - scroll_x > SCREEN_W or ox + img.get_width() - scroll_x < 0: continue
+            if oy - scroll_y > SCREEN_H or oy + img.get_height() - scroll_y < 0: continue
+            surface.blit(img, (ox - scroll_x, oy - scroll_y))
 
         # Draw Fountain if present 
         if fountain_frames:
@@ -586,6 +753,8 @@ def run_level(surface, game_state=None):
         draw_hud(surface, game_state, player)
 
         player.draw(surface, scroll_x, scroll_y)
+        if bot:
+            bot.draw(surface, scroll_x, scroll_y)
         pygame.display.flip()
 
     return "quit"

@@ -1,7 +1,10 @@
 # Shadow Stalker - Python Dependencies
 
 # Core game library
-pygame>=2.5.0
+pygame-ce>=2.5.0
+
+# For procedural audio system
+numpy>=1.24.0
 
 # Optional: For self-learning AI bot (see ai/SELF_LEARNING_BOT.md)
 # gymnasium>=0.29.0
